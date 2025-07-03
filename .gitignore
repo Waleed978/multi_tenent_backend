@@ -1,26 +1,36 @@
-# Binaries for programs and plugins
+# Go
+# Binaries for programs
 *.exe
-*.exe~
 *.dll
 *.so
 *.dylib
+
+# Test binary, can be excluded to make builds reproducible
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# Output of the go build command
 *.out
 
-# Dependency directories (remove the comment below if you use Go modules)
+# Dependency directories (Go modules cache)
 /vendor/
 
-# Go workspace file
-*.code-workspace
+# Environment variables file
+.env
 
-# IDE/editor directories and files
-.vscode/
-.idea/
-*.swp
-*.swo
-.DS_Store
+# IDE specific files
+.idea/             # IntelliJ IDEA
+.vscode/           # VS Code
+*.sublime-project  # Sublime Text
+*.sublime-workspace
+.DS_Store          # macOS specific files
 
-# Environment files
-.env 
+# Logs
+*.log
+
+# Database specific (if any local database files are generated, though PostgreSQL is external)
+# For example, if you were using SQLite:
+# *.db
+# *.sqlite3
+
+# Build artifacts for Go modules
+go.sum
