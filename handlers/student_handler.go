@@ -3,10 +3,10 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"time" // Import time package
 
 	"github.com/Waleed978/multi_tenent_backend/models"
 	"github.com/Waleed978/multi_tenent_backend/services"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -42,12 +42,20 @@ func (h *StudentHandler) CreateStudent(c *gin.Context) {
 			for _, fieldErr := range validationErrors {
 				errors[fieldErr.Field()] = fieldErr.Tag()
 			}
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Validation failed", "details": errors})
+			 c.JSON(http.StatusBadRequest, gin.H{"error": "Validation failed", "details": errors})
 			return
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// --- ADD THIS LOGIC ---
+	// If EnrolledAt is not provided in the JSON (i.e., it's its zero value),
+	// set it to the current date.
+	if student.EnrolledAt.IsZero() {
+		student.EnrolledAt = time.Now()
+	}
+	// --- END ADDED LOGIC ---
 
 	// Call the service layer to create the student.
 	if err := h.studentService.CreateStudent(&student); err != nil {
@@ -98,7 +106,6 @@ func (h *StudentHandler) GetStudent(c *gin.Context) {
 // @Router /students [get]
 func (h *StudentHandler) GetStudents(c *gin.Context) {
 	students, err := h.studentService.GetAllStudents()
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve students", "details": err.Error()})
 		return
@@ -161,6 +168,7 @@ func (h *StudentHandler) UpdateStudent(c *gin.Context) {
 		student.CreatedAt = existingStudent.CreatedAt
 	}
 	// Preserve EnrolledAt from existing student if not provided in update payload
+	// This is important for updates, so it doesn't overwrite with 0001-01-01
 	if student.EnrolledAt.IsZero() {
 		student.EnrolledAt = existingStudent.EnrolledAt
 	}
